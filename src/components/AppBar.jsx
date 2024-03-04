@@ -1,44 +1,67 @@
-import { Text, View, StyleSheet, ScrollView, Pressable } from "react-native";
-import { Link } from "react-router-native";
+import { View, ScrollView, StyleSheet } from "react-native";
 import Constants from "expo-constants";
+import { Link } from "react-router-native";
+import { useQuery } from "@apollo/client";
+import { GET_CURRENT_USER } from "../graphql/queries";
+
+import theme from "../theme";
+import Text from "./Text";
 
 const styles = StyleSheet.create({
   container: {
     paddingTop: Constants.statusBarHeight,
-    flexDirection: "row",
-    backgroundColor: "#24292e",
-    height: 80,
-    alignItems: "center",
+    backgroundColor: theme.colors.appBarBackground,
   },
-  text: {
+  scrollView: {
+    flexDirection: "row",
+  },
+  tabTouchable: {
+    flexGrow: 0,
+  },
+  tabContainer: {
+    paddingHorizontal: 15,
+    paddingVertical: 20,
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  tabText: {
     color: "white",
-    fontSize: 16,
-    margin: 10,
   },
 });
 
-const AppBar = () => {
-  const onPress = () => {
-    console.log("Pressed");
-  };
+const CurrentUser = () => {
+  const { data } = useQuery(GET_CURRENT_USER);
+  console.log(data);
+  return data ? data.me : null;
+};
 
+const AppBarTab = ({ children, ...props }) => {
   return (
-    <View style={styles.container}>
-      <ScrollView horizontal>
-        <AppBarTab link="/" text="Repositories" onPress={onPress} />
-        <AppBarTab link="/signin" text="Sign In" onPress={onPress} />
-      </ScrollView>
-    </View>
+    <Link style={styles.tabTouchable} {...props}>
+      <View style={styles.tabContainer}>
+        <Text fontWeight="bold" style={styles.tabText}>
+          {children}
+        </Text>
+      </View>
+    </Link>
   );
 };
 
-const AppBarTab = (props) => {
+const AppBar = () => {
+  const currentUser = CurrentUser();
+  console.log(currentUser);
   return (
-    <Pressable onPress={props.onPress}>
-      <Link to={props.link}>
-        <Text style={styles.text}>{props.text}</Text>
-      </Link>
-    </Pressable>
+    <View style={styles.container}>
+      <ScrollView style={styles.scrollView} horizontal>
+        <AppBarTab to="/">Repositories</AppBarTab>
+        {!currentUser ? (
+          <AppBarTab to="/sign-in">Sign in</AppBarTab>
+        ) : (
+          <AppBarTab to="/sign-out">Sign out</AppBarTab>
+        )}
+      </ScrollView>
+    </View>
   );
 };
 

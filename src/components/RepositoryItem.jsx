@@ -1,99 +1,117 @@
 import { View, Image, StyleSheet } from "react-native";
+
+import theme from "../theme";
 import Text from "./Text";
+import formatInThousands from "../utils/formatInThousands";
 
-const RepositoryItem = ({ item }) => {
-  const style = StyleSheet.create({
-    container: {
-      display: "flex",
-      flexDirection: "column",
-      padding: 10,
-      backgroundColor: "white",
-    },
-    tinyLogo: {
-      width: 50,
-      height: 50,
-      padding: 10,
-    },
-    info: {
-      display: "flex",
-      flexDirection: "row",
-    },
-    infoContent: {
-      display: "flex",
-      flexDirection: "column",
-      paddingLeft: 10,
-      justifyContent: "space-between",
-    },
-    infoText: {
-      fontSize: 16,
-      display: "flex",
-      paddingRight: 50,
-    },
-    fullName: {
-      fontSize: 16,
-    },
-    language: {
-      backgroundColor: "#0366d6",
-      color: "white",
-      padding: 5,
-      borderRadius: 5,
-      alignSelf: "flex-start",
-    },
-    stats: {
-      display: "flex",
-      flexDirection: "row",
-      justifyContent: "space-around",
-      padding: 10,
-    },
-    statsColumn: {
-      display: "flex",
-      flexDirection: "column",
-    },
-    statsText: {
-      textAlign: "center",
-      fontSize: 16,
-    },
-    otherText: {
-      textAlign: "center",
-      fontSize: 16,
-    },
-  });
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: "white",
+    padding: 15,
+  },
+  topContainer: {
+    flexDirection: "row",
+    marginBottom: 15,
+  },
+  bottomContainer: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+  },
+  avatarContainer: {
+    flexGrow: 0,
+    marginRight: 20,
+  },
+  contentContainer: {
+    flexGrow: 1,
+    flexShrink: 1,
+  },
+  nameText: {
+    marginBottom: 5,
+  },
+  descriptionText: {
+    flexGrow: 1,
+  },
+  avatar: {
+    width: 45,
+    height: 45,
+    borderRadius: theme.roundness,
+  },
+  countItem: {
+    flexGrow: 0,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 15,
+  },
+  countItemCount: {
+    marginBottom: 5,
+  },
+  languageContainer: {
+    marginTop: 10,
+    flexDirection: "row",
+  },
+  languageText: {
+    color: "white",
+    backgroundColor: theme.colors.primary,
+    borderRadius: theme.roundness,
+    flexGrow: 0,
+    paddingVertical: 3,
+    paddingHorizontal: 6,
+  },
+});
 
-  const stars =
-    item.stargazersCount > 1000
-      ? `${(item.stargazersCount / 1000).toFixed(1)}k`
-      : item.stargazersCount;
-  const forks =
-    item.forksCount > 1000
-      ? `${(item.forksCount / 1000).toFixed(1)}k`
-      : item.forksCount;
-
-  const StatsColumn = ({ count, label }) => (
-    <View style={style.statsColumn}>
-      <Text fontWeight="bold" style={style.statsText}>
-        {count}
+const CountItem = ({ label, count }) => {
+  return (
+    <View style={styles.countItem}>
+      <Text style={styles.countItemCount} fontWeight="bold">
+        {formatInThousands(count)}
       </Text>
-      <Text style={style.otherText}>{label}</Text>
+      <Text color="textSecondary">{label}</Text>
     </View>
   );
+};
+
+const RepositoryItem = ({ repository }) => {
+  const {
+    fullName,
+    description,
+    language,
+    forksCount,
+    stargazersCount,
+    ratingAverage,
+    reviewCount,
+    ownerAvatarUrl,
+  } = repository;
 
   return (
-    <View style={style.container}>
-      <View style={style.info}>
-        <Image style={style.tinyLogo} source={{ uri: item.ownerAvatarUrl }} />
-        <View style={style.infoContent}>
-          <Text fontWeight="bold" style={style.fullName}>
-            {item.fullName}
+    <View style={styles.container}>
+      <View style={styles.topContainer}>
+        <View style={styles.avatarContainer}>
+          <Image source={{ uri: ownerAvatarUrl }} style={styles.avatar} />
+        </View>
+        <View style={styles.contentContainer}>
+          <Text
+            style={styles.nameText}
+            fontWeight="bold"
+            fontSize="subheading"
+            numberOfLines={1}
+          >
+            {fullName}
           </Text>
-          <Text style={style.infoText}>{item.description}</Text>
-          <Text style={style.language}>{item.language}</Text>
+          <Text style={styles.descriptionText} color="textSecondary">
+            {description}
+          </Text>
+          {language ? (
+            <View style={styles.languageContainer}>
+              <Text style={styles.languageText}>{language}</Text>
+            </View>
+          ) : null}
         </View>
       </View>
-      <View style={style.stats}>
-        <StatsColumn count={stars} label="Stars" />
-        <StatsColumn count={forks} label="Forks" />
-        <StatsColumn count={item.reviewCount} label="Reviews" />
-        <StatsColumn count={item.ratingAverage} label="Rating" />
+      <View style={styles.bottomContainer}>
+        <CountItem count={stargazersCount} label="Stars" />
+        <CountItem count={forksCount} label="Forks" />
+        <CountItem count={reviewCount} label="Reviews" />
+        <CountItem count={ratingAverage} label="Rating" />
       </View>
     </View>
   );
