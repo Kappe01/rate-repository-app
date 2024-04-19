@@ -1,5 +1,5 @@
-import { View, Image, StyleSheet } from "react-native";
-
+import { View, Image, StyleSheet, Button } from "react-native";
+import * as Linking from "expo-linking";
 import theme from "../theme";
 import Text from "./Text";
 import formatInThousands from "../utils/formatInThousands";
@@ -80,10 +80,11 @@ const RepositoryItem = ({ repository }) => {
     ratingAverage,
     reviewCount,
     ownerAvatarUrl,
+    url,
   } = repository;
 
   return (
-    <View style={styles.container}>
+    <View testID="repositoryItem" style={styles.container}>
       <View style={styles.topContainer}>
         <View style={styles.avatarContainer}>
           <Image source={{ uri: ownerAvatarUrl }} style={styles.avatar} />
@@ -113,6 +114,11 @@ const RepositoryItem = ({ repository }) => {
         <CountItem count={reviewCount} label="Reviews" />
         <CountItem count={ratingAverage} label="Rating" />
       </View>
+      {url ? (
+        <Button title="Open in GitHub" onPress={() => Linking.openURL(url)}>
+          Open in GitHub
+        </Button>
+      ) : null}
     </View>
   );
 };

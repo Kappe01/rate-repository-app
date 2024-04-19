@@ -6,6 +6,7 @@ import { useNavigate } from "react-router-native";
 import Button from "./Button";
 import FormikTextInput from "./FormikTextInput";
 import useSignIn from "../hooks/useSignIn";
+import useSignUp from "../hooks/useSignUp";
 
 const styles = StyleSheet.create({
   container: {
@@ -20,11 +21,24 @@ const styles = StyleSheet.create({
 const initialValues = {
   username: "",
   password: "",
+  passwordConfirmation: "",
 };
 
 const validationSchema = yup.object().shape({
-  username: yup.string().required("Username is required"),
-  password: yup.string().required("Password is required"),
+  username: yup
+    .string()
+    .min(5, "Username must be at least 5 characters")
+    .max(30, "Username must be at most 30 characters")
+    .required("Username is required"),
+  password: yup
+    .string()
+    .min(5, "Password must be at least 5 characters")
+    .max(50, "Password must be at most 50 characters")
+    .required("Password is required"),
+  passwordConfirmation: yup
+    .string()
+    .oneOf([yup.ref("password"), null], "Passwords do not match")
+    .required("Password confirmation is required"),
 });
 
 export const SignInForm = ({ onSubmit }) => {
@@ -46,25 +60,41 @@ export const SignInForm = ({ onSubmit }) => {
               secureTextEntry
             />
           </View>
-          <Button onPress={handleSubmit}>Sign in</Button>
+          <View style={styles.fieldContainer}>
+            <FormikTextInput
+              name="passwordConfirmation"
+              placeholder="Password confirmation"
+              secureTextEntry
+            />
+          </View>
+          <Button onPress={handleSubmit}>Sign up</Button>
         </View>
       )}
     </Formik>
   );
 };
 
-const SignIn = () => {
+const SignUp = () => {
   const signIn = useSignIn();
+  const signUp = useSignUp();
   const navigate = useNavigate();
 
   const onSubmit = async (values) => {
     const { username, password } = values;
 
     try {
-      const data = await signIn({ username, password });
+      const data = await signUp({ username, password });
+
       if (data) {
-        console.log(data);
-        navigate("/");
+        try {
+          const signInData = await signIn({ username, password });
+          if (signInData) {
+            console.log("data", signInData);
+            navigate("/");
+          }
+        } catch (e) {
+          console.log(e);
+        }
       }
     } catch (e) {
       console.log(e);
@@ -74,4 +104,4 @@ const SignIn = () => {
   return <SignInForm onSubmit={onSubmit} />;
 };
 
-export default SignIn;
+export default SignUp;
