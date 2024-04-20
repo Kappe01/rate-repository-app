@@ -96,15 +96,7 @@ const RepositoryList = () => {
 
   const pickerRef = useRef();
 
-  function open() {
-    pickerRef.current.focus();
-  }
-
-  function close() {
-    pickerRef.current.blur();
-  }
-
-  const onValueChange = (itemValue, itemIndex) => {
+  const onValueChange = (itemValue) => {
     setSelectedValue(itemValue);
     switch (itemValue) {
       case "Latest repositories":

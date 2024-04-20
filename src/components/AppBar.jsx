@@ -58,6 +58,7 @@ const AppBar = () => {
         {currentUser ? (
           <AppBarTab to="/review">Create a review</AppBarTab>
         ) : null}
+        {currentUser ? <AppBarTab to="/reviews">My reviews</AppBarTab> : null}
         {!currentUser ? (
           <AppBarTab to="/sign-in">Sign in</AppBarTab>
         ) : (
